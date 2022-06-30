@@ -3,6 +3,7 @@ import Boom from '@hapi/boom';
 import { Knex } from 'knex';
 import knex from './db/db'
 import v4, { uuid } from 'uuidv4';
+import { z } from 'zod';
 
 const init = async () => {
 
@@ -69,14 +70,38 @@ const init = async () => {
         }
     });
 
+
+    // Create the validation rules with Zod then infer the type
+    const CreateAccountBodyValidation = z.object({
+        user_name: z.string(),
+        account_name: z.string()
+    })
+
+    type CreateAccountBody = z.infer<typeof CreateAccountBodyValidation>
+
     server.route({
         method: 'POST',
         path: '/account/create',
         handler: async (request, h) => {
-            const body: {
-                user_name: string,
-                account_name: string
-            } = request.payload as any
+            const body: CreateAccountBody = request.payload as any
+
+            const userInput: CreateAccountBody = {
+                user_name: body.user_name,
+                account_name: body.account_name
+            }
+
+            try {
+                CreateAccountBodyValidation.parse(userInput);
+            } catch (err) {
+                console.log(err)
+                const error = Boom.badRequest('Invalid input was provided.')
+                return h.response({
+                    success: false,
+                    response: error.output.payload,
+                }).code(error.output.statusCode)
+            }
+
+
 
             try {
                 // Generate IDs
@@ -86,11 +111,11 @@ const init = async () => {
                 // Insert a user first and then associate an account. TODO: if account creation fails, delete user.
                 await db.raw(`
                     INSERT INTO public.users (id, user_name) 
-                    VALUES('${userId}', '${body.user_name}');
+                    VALUES('${userId}', '${userInput.user_name}');
                     `)
                 await db.raw(`
                     INSERT INTO public.accounts (id, account_name, user_id) 
-                    VALUES('${accountId}', '${body.account_name}', '${userId}')
+                    VALUES('${accountId}', '${userInput.account_name}', '${userId}')
                 `)
 
                 // Fetch the newly created user account and return it in the response
