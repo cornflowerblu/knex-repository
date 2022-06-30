@@ -74,11 +74,21 @@ const init = async () => {
             } = request.payload as any
 
             try {
+                // Generate IDs
                 const userId = uuid()
                 const accountId = uuid()
-                await db.raw(`INSERT INTO public.users (id, user_name) VALUES('${userId}', '${body.user_name}');`)
-                await db.raw(`INSERT INTO public.accounts (id, account_name, user_id) VALUES('${accountId}', '${body.account_name}', '${userId}')`)
 
+                // Insert a user first and then associate an account. TODO: if account creation fails, delete user.
+                await db.raw(`
+                    INSERT INTO public.users (id, user_name) 
+                    VALUES('${userId}', '${body.user_name}');
+                    `)
+                await db.raw(`
+                    INSERT INTO public.accounts (id, account_name, user_id) 
+                    VALUES('${accountId}', '${body.account_name}', '${userId}')
+                `)
+
+                // Fetch the newly created user account and return it in the response
                 const userAccount =
                     await db('users')
                         .join('accounts', 'users.id', '=', 'accounts.user_id')
