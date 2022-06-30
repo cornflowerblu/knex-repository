@@ -69,21 +69,21 @@ const init = async () => {
         path: '/account/create',
         handler: async (request, h) => {
             const body: {
-                id: number,
                 user_name: string,
                 account_name: string
             } = request.payload as any
 
             try {
-                await db.raw(`INSERT INTO public.users (id, user_name) VALUES('${uuid()}', '${body.user_name}');`)
-                const userId = await db.raw(`SELECT id FROM public.users WHERE user_name = '${body.user_name}'`)
-                await db.raw(`INSERT INTO public.accounts (id, account_name, user_id) VALUES('${uuid()}', '${body.account_name}', '${userId.rows[0].id}')`)
+                const userId = uuid()
+                const accountId = uuid()
+                await db.raw(`INSERT INTO public.users (id, user_name) VALUES('${userId}', '${body.user_name}');`)
+                await db.raw(`INSERT INTO public.accounts (id, account_name, user_id) VALUES('${accountId}', '${body.account_name}', '${userId}')`)
 
                 const userAccount =
                     await db('users')
                         .join('accounts', 'users.id', '=', 'accounts.user_id')
                         .select('users.id', 'users.user_name', 'accounts.account_name')
-                        .where('users.id', '=', `${userId.rows[0].id}`)
+                        .where('users.id', '=', `${userId}`)
 
                 return h.response({
                     success: true,
@@ -102,8 +102,6 @@ const init = async () => {
             }
         }
     });
-
-
 
     //Start the Hapi server
     await server.start();
