@@ -43,14 +43,15 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/users',
-        handler: async (_request, h) => {
+        handler: async (request, h) => {
             try {
-                const data = await db.raw('SELECT * FROM USERS LIMIT 1000')
+                const data = await db('users').select().limit(request.query.limit || 100)
+                const count = await db('users').count()
                 return h.response({
                     success: true,
                     response: {
                         message: 'Query executed successfully.',
-                        data: data.rows
+                        data: data, count
                     }
                 })
             } catch (err) {
