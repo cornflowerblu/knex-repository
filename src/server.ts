@@ -22,11 +22,15 @@ const init = async () => {
                     db('users')
                         .join('accounts', 'users.id', '=', 'accounts.user_id')
                         .select('users.id', 'users.user_name', 'accounts.account_name')
+                        .limit(request.query.limit || 100)
+
+                const count = await db('users').join('accounts', 'users.id', '=', 'accounts.user_id').count()
+
                 return h.response({
                     success: true,
                     response: {
                         message: 'Query executed successfully.',
-                        data: data
+                        data: data, count
                     }
                 })
             } catch (err) {
