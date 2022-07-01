@@ -35,7 +35,6 @@ const init = async () => {
             watchPg: true,
             graphiql: true,
             enhanceGraphiql: true,
-
         })
     )
     .listen(process.env.PORT || 8000);

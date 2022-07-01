@@ -2,7 +2,7 @@ import { AuthCredentials, Plugin } from 'hapi__hapi';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 
-const plugin: Plugin<null> = {
+const authPlugin: Plugin<null> = {
     name: 'auth',
     register: async (server) => {
         server.auth.scheme('key', (server, options) => {
@@ -15,7 +15,8 @@ const plugin: Plugin<null> = {
                 },
             };
         });
+        server.auth.strategy('key', 'key');
     }
 }
 
-export default plugin;
+export default authPlugin;
