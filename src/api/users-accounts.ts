@@ -2,7 +2,6 @@ import { ServerRoute } from '@hapi/hapi'
 import Boom from '@hapi/boom';
 import { Knex } from 'knex';
 import knex from '../db/knex'
-import v4, { uuid } from 'uuidv4';
 import { z } from 'zod';
 
 
@@ -75,24 +74,21 @@ const userAcountRoutes: ServerRoute[] = [{
         }
 
         try {
-            // Generate IDs
-            const userId = uuid()
-            const accountId = uuid()
-
             // Insert a user first and then associate an account. If account creation fails, delete user.
-            await db.raw(`
-                    INSERT INTO public.users (id, user_name) 
-                    VALUES('${userId}', '${userInput.user_name}');
+            const user = await db.raw(`
+                    INSERT INTO public.users (user_name) 
+                    VALUES('${userInput.user_name}')
+                    RETURNING id;
                 `)
 
             try {
                 await db.raw(`
-                    INSERT INTO public.accounts (id, account_name, user_id) 
-                    VALUES('${accountId}', '${userInput.account_name}', '${userId}')
+                    INSERT INTO public.accounts ( account_name, user_id) 
+                    VALUES('${userInput.account_name}', '${user.rows[0].id}')
                 `)
             } catch (err) {
                 await db.raw(`
-                    DELETE FROM public.users WHERE id = '${userId}'
+                    DELETE FROM public.users WHERE id = '${user.rows[0].id}'
             `)
                 console.log(err)
                 const error = Boom.badRequest('Account already exists. User was not added.')
@@ -107,7 +103,7 @@ const userAcountRoutes: ServerRoute[] = [{
                 await db('users')
                     .join('accounts', 'users.id', '=', 'accounts.user_id')
                     .select('users.id', 'users.user_name', 'accounts.account_name')
-                    .where('users.id', '=', `${userId}`)
+                    .where('users.id', '=', `${user.rows[0].id}`)
 
             return h.response({
                 success: true,
