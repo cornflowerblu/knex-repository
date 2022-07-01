@@ -12,6 +12,11 @@ const init = async () => {
         host: 'localhost'
     });
 
+    //Spin up the plugins
+    await server.register({
+        plugin: require('./plugins/auth').default,
+    });
+
     //Start the Hapi server
     await server.start();
     console.log('Server running on %s', server.info.uri);
@@ -30,6 +35,7 @@ const init = async () => {
             watchPg: true,
             graphiql: true,
             enhanceGraphiql: true,
+
         })
     )
     .listen(process.env.PORT || 8000);
