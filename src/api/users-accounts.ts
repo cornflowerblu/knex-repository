@@ -1,7 +1,7 @@
 import { ServerRoute } from '@hapi/hapi'
 import Boom from '@hapi/boom';
 import { Knex } from 'knex';
-import knex from './db/db'
+import knex from '../db/db'
 import v4, { uuid } from 'uuidv4';
 import { z } from 'zod';
 
@@ -10,11 +10,6 @@ type UserAccountResponse = {
     id: string,
     user_name: string,
     account_name: string
-}
-
-type UserResponse = {
-    id: string,
-    user_name: string
 }
 
 // Create the validation rules with Zod then infer the type
@@ -57,33 +52,8 @@ const userAcountRoutes: ServerRoute[] = [{
     }
 },
 {
-    method: 'GET',
-    path: '/users',
-    handler: async (request, h) => {
-        const db: Knex = await knex();
-        try {
-            const data: Array<UserResponse> = await db('users').select().limit(request.query.limit || 100)
-            const count = await db('users').count()
-            return h.response({
-                success: true,
-                response: {
-                    message: 'Query executed successfully.',
-                    data: data, count
-                }
-            })
-        } catch (err) {
-            console.log(err)
-            const error = Boom.badRequest('Query could not be run.')
-            return h.response({
-                success: false,
-                response: error.output.payload,
-            }).code(error.output.statusCode)
-        }
-    }
-},
-{
     method: 'POST',
-    path: '/account/create',
+    path: '/user/account/create',
     handler: async (request, h) => {
         const db: Knex = await knex();
         const body: CreateAccountBody = request.payload as any
@@ -133,7 +103,7 @@ const userAcountRoutes: ServerRoute[] = [{
             }
 
             // Fetch the newly created user account and return it in the response
-            const userAccount =
+            const userAccount: Array<UserAccountResponse> =
                 await db('users')
                     .join('accounts', 'users.id', '=', 'accounts.user_id')
                     .select('users.id', 'users.user_name', 'accounts.account_name')

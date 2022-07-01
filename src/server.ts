@@ -1,5 +1,6 @@
 import Hapi from '@hapi/hapi'
-import userAcountRoutes from './users-accounts';
+import userRoutes from './api/users';
+import userAcountRoutes from './api/users-accounts';
 
 
 const init = async () => {
@@ -15,6 +16,7 @@ const init = async () => {
 
     //Load up the routes
     server.route(userAcountRoutes);
+    server.route(userRoutes);
 };
 
 process.on('unhandledRejection', (err) => {
