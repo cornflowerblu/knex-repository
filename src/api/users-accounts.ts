@@ -55,15 +55,10 @@ const userAcountRoutes: ServerRoute[] = [{
     path: '/user/account/create',
     handler: async (request, h) => {
         const db: Knex = await knex();
-        const body: CreateAccountBody = request.payload as any
-
-        const userInput: CreateAccountBody = {
-            user_name: body.user_name,
-            account_name: body.account_name
-        }
+        const { user_name, account_name } = request.payload as CreateAccountBody
 
         try {
-            CreateAccountBodyValidation.parse(userInput);
+            CreateAccountBodyValidation.parse(request.payload);
         } catch (err) {
             console.log(err)
             const error = Boom.badRequest('Invalid input was provided.')
@@ -77,14 +72,14 @@ const userAcountRoutes: ServerRoute[] = [{
             // Insert a user first and then associate an account. If account creation fails, delete user.
             const user = await db.raw(`
                     INSERT INTO public.users (user_name) 
-                    VALUES('${userInput.user_name}')
+                    VALUES('${user_name}')
                     RETURNING id;
                 `)
 
             try {
                 await db.raw(`
                     INSERT INTO public.accounts ( account_name, user_id) 
-                    VALUES('${userInput.account_name}', '${user.rows[0].id}')
+                    VALUES('${account_name}', '${user.rows[0].id}')
                 `)
             } catch (err) {
                 await db.raw(`
