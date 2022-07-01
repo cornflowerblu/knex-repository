@@ -1,4 +1,4 @@
-import { Request, ResponseToolkit, ServerRoute } from '@hapi/hapi'
+import { ServerRoute } from '@hapi/hapi'
 import Boom from '@hapi/boom';
 import { Knex } from 'knex';
 import knex from './db/db'
