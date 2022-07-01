@@ -124,7 +124,7 @@ const init = async () => {
                      DELETE FROM public.users WHERE id = '${userId}'
                 `)
                     console.log(err)
-                    const error = Boom.badRequest('Account name already exists. User was not added.')
+                    const error = Boom.badRequest('Account already exists. User was not added.')
                     return h.response({
                         success: false,
                         response: error.output.payload,
