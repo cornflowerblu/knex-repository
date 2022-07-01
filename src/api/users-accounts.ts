@@ -1,7 +1,7 @@
 import { ServerRoute } from '@hapi/hapi'
 import Boom from '@hapi/boom';
 import { Knex } from 'knex';
-import knex from '../db/db'
+import knex from '../db/knex'
 import v4, { uuid } from 'uuidv4';
 import { z } from 'zod';
 
