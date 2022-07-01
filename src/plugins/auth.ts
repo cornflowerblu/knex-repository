@@ -1,4 +1,4 @@
-import { AuthCredentials, Plugin } from 'hapi__hapi';
+import { Plugin } from 'hapi__hapi';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 
