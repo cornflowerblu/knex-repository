@@ -108,15 +108,28 @@ const init = async () => {
                 const userId = uuid()
                 const accountId = uuid()
 
-                // Insert a user first and then associate an account. TODO: if account creation fails, delete user.
+                // Insert a user first and then associate an account. If account creation fails, delete user.
                 await db.raw(`
-                    INSERT INTO public.users (id, user_name) 
-                    VALUES('${userId}', '${userInput.user_name}');
+                        INSERT INTO public.users (id, user_name) 
+                        VALUES('${userId}', '${userInput.user_name}');
                     `)
-                await db.raw(`
-                    INSERT INTO public.accounts (id, account_name, user_id) 
-                    VALUES('${accountId}', '${userInput.account_name}', '${userId}')
+
+                try {
+                    await db.raw(`
+                     INSERT INTO public.accounts (id, account_name, user_id) 
+                        VALUES('${accountId}', '${userInput.account_name}', '${userId}')
+                    `)
+                } catch (err) {
+                    await db.raw(`
+                     DELETE FROM public.users WHERE id = '${userId}'
                 `)
+                    console.log(err)
+                    const error = Boom.badRequest('Account name already exists. User was not added.')
+                    return h.response({
+                        success: false,
+                        response: error.output.payload,
+                    }).code(error.output.statusCode)
+                }
 
                 // Fetch the newly created user account and return it in the response
                 const userAccount =
