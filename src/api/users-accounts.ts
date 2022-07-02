@@ -19,7 +19,7 @@ const CreateAccountBodyValidation = z.object({
 
 type CreateAccountBody = z.infer<typeof CreateAccountBodyValidation>
 
-const userAcountRoutes: ServerRoute[] = [{
+const userAccountRoutes: ServerRoute[] = [{
     method: 'GET',
     path: '/users/account',
     handler: async (request, h) => {
@@ -118,4 +118,4 @@ const userAcountRoutes: ServerRoute[] = [{
     }
 }]
 
-export default userAcountRoutes;
+export default userAccountRoutes;

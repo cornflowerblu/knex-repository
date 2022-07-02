@@ -1,6 +1,6 @@
 import Hapi from '@hapi/hapi'
 import userRoutes from './api/users';
-import userAcountRoutes from './api/users-accounts';
+import userAccountRoutes from './api/users-accounts';
 import http from 'http'
 import { postgraphile } from 'postgraphile'
 
@@ -22,7 +22,7 @@ const init = async () => {
     console.log('Server running on %s', server.info.uri);
 
     //Load up the routes
-    server.route(userAcountRoutes);
+    server.route(userAccountRoutes);
     server.route(userRoutes);
 
     //Spin up GraphQL
