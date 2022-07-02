@@ -4,6 +4,7 @@ import * as graph from 'graphql-request'
 
 type UserResponse = {
     id: string,
+    nodeId: string,
     user_name: string
 }
 

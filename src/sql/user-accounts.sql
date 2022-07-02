@@ -13,3 +13,4 @@ CREATE TABLE public.accounts (
 	CONSTRAINT accounts_un UNIQUE (account_name),
 	CONSTRAINT accounts_fk FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+
