@@ -2,7 +2,7 @@ import { ServerRoute } from "@hapi/hapi";
 import Boom from '@hapi/boom';
 import * as graph from 'graphql-request'
 
-type UserResponse = {
+type CoreUserResponse = {
     id: string,
     nodeId: string,
     email: string,
@@ -32,7 +32,7 @@ const coreUserRoutes: ServerRoute = {
           }`
         
         try {
-            const result: Array<UserResponse> = await 
+            const result: Array<CoreUserResponse> = await 
                 graph
                  .request('http://localhost:8000/graphql', query, null, request.headers)
 
