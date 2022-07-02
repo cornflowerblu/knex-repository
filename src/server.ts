@@ -35,6 +35,9 @@ const init = async () => {
             watchPg: true,
             graphiql: true,
             enhanceGraphiql: true,
+            jwtPgTypeIdentifier: 'public.jwt_token',
+            jwtSecret: 'thegreatestandbestsecretintheworld',
+            pgDefaultRole: 'no_access_role'
         })
     )
     .listen(process.env.PORT || 8000);
