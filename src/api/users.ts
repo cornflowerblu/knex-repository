@@ -8,7 +8,7 @@ type UserResponse = {
     user_name: string
 }
 
-const userRoutes: ServerRoute[] = [{
+const userRoutes: ServerRoute = {
     method: 'GET',
     path: '/users',
     handler: async (request, h) => {
@@ -44,6 +44,6 @@ const userRoutes: ServerRoute[] = [{
             }).code(error.output.statusCode)
         }
     }
-}]
+}
 
 export default userRoutes
