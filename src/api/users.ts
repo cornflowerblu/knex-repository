@@ -1,7 +1,6 @@
 import { ServerRoute } from "@hapi/hapi";
 import Boom from '@hapi/boom';
-import { Knex } from 'knex';
-import knex from '../db/knex'
+import * as graph from 'graphql-request'
 
 type UserResponse = {
     id: string,
@@ -11,17 +10,28 @@ type UserResponse = {
 const userRoutes: ServerRoute[] = [{
     method: 'GET',
     path: '/users',
-    options: { auth: 'key'},
     handler: async (request, h) => {
-        const db: Knex = await knex();
+        const query = graph.gql`{
+            allUsers {
+              nodes {
+                id
+                nodeId
+                userName
+              }
+              totalCount
+            }
+          }`
+        
         try {
-            const data: Array<UserResponse> = await db('users').select().limit(request.query.limit || 100)
-            const count = await db('users').count()
+            const result: Array<UserResponse> = await 
+                graph
+                 .request('http://localhost:8000/graphql', query, null, request.headers)
+
             return h.response({
                 success: true,
                 response: {
                     message: 'Query executed successfully.',
-                    data: data, count
+                    data: result
                 }
             })
         } catch (err) {
