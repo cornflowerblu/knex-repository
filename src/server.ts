@@ -3,6 +3,7 @@ import userRoutes from './api/users';
 import userAccountRoutes from './api/users-accounts';
 import http from 'http'
 import { postgraphile } from 'postgraphile'
+import coreUserRoutes from './api/core-users';
 
 
 const init = async () => {
@@ -24,6 +25,7 @@ const init = async () => {
     //Load up the routes
     server.route(userAccountRoutes);
     server.route(userRoutes);
+    server.route(coreUserRoutes);
 
     //Spin up GraphQL
     http
